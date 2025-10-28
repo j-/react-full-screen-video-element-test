@@ -60,34 +60,29 @@ export const App: FC = () => {
       />
 
       <div>
-        <button type="button" onClick={async () => {
-          try {
-            const canvas = canvasRef.current;
-            if (!canvas) throw new Error('Expected canvas ref to not be empty');
-            
-            const ctx = canvas.getContext('2d');
-            if (!ctx) throw new Error('Failed to get canvas rendering context');
-                
-            ctx.fillStyle = selectedColor;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-          } catch (err) {
-            showBoundary(err);
-          }
-        }}>
+        <button type="button" onClick={withErrorBoundary(async () => {
+          const canvas = canvasRef.current;
+          if (!canvas) throw new Error('Expected canvas ref to not be empty');
+          
+          const ctx = canvas.getContext('2d');
+          if (!ctx) throw new Error('Failed to get canvas rendering context');
+              
+          ctx.fillStyle = selectedColor;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+        })}>
           Fill with input color
         </button>
 
-        <button type="button" onClick={async () => {
-          try {
-            const canvas = canvasRef.current;
-            if (!canvas) throw new Error('Expected canvas ref to not be empty');
+        <br />
+        <br />
 
-            await screenfull.request(canvasRef.current!);
-          } catch (err) {
-            showBoundary(err);
-          }
-        }}>
-          Request fullscreen
+        <button type="button" onClick={withErrorBoundary(async () => {
+          const canvas = canvasRef.current;
+          if (!canvas) throw new Error('Expected canvas ref to not be empty');
+
+          await screenfull.request(canvasRef.current!);
+        })}>
+          Request fullscreen (screenfull)
         </button>
       </div>
 
@@ -107,37 +102,83 @@ export const App: FC = () => {
       />
 
       <div>
-        <button type="button" onClick={async () => {
-          try {
-            const canvas = canvasRef.current;
-            if (!canvas) throw new Error('Expected canvas ref to not be empty');
-            
-            const video = videoRef.current;
-            if (!video) throw new Error('Expected video ref to not be empty');
-            
-            const stream = canvas.captureStream(0);
-            const [track] = stream.getVideoTracks() as CanvasCaptureMediaStreamTrack[];
-            track.requestFrame();
-        
-            video.srcObject = new MediaStream([track]);
-          } catch (err) {
-            showBoundary(err);
-          }
-        }}>
+        <button type="button" onClick={withErrorBoundary(async () => {
+          const canvas = canvasRef.current;
+          if (!canvas) throw new Error('Expected canvas ref to not be empty');
+          
+          const video = videoRef.current;
+          if (!video) throw new Error('Expected video ref to not be empty');
+          
+          const stream = canvas.captureStream(0);
+          const [track] = stream.getVideoTracks() as CanvasCaptureMediaStreamTrack[];
+          track.requestFrame();
+      
+          video.srcObject = new MediaStream([track]);
+        })}>
           Set video stream
         </button>
 
-        <button type="button" onClick={async () => {
-          try {
-            const video = videoRef.current;
-            if (!video) throw new Error('Expected video ref to not be empty');
+        <br />
+        <br />
 
-            await screenfull.request(videoRef.current!);
-          } catch (err) {
-            showBoundary(err);
+        <button type="button" onClick={withErrorBoundary(async () => {
+          const video = videoRef.current;
+          if (!video) throw new Error('Expected video ref to not be empty');
+
+          await screenfull.request(videoRef.current!);
+        })}>
+          Request fullscreen (screenfull)
+        </button>
+
+        <br />
+
+        <button type="button" onClick={withErrorBoundary(() => {
+          const video = videoRef.current as HTMLVideoElement & {
+            webkitEnterFullscreen?: () => void;
+          };
+          if (!video) throw new Error('Expected video ref to not be empty');
+
+          if (typeof video.webkitEnterFullscreen !== 'function') {
+            throw new Error('Webkit enter fullscreen API not available');
           }
-        }}>
-          Request fullscreen
+
+          video.webkitEnterFullscreen();
+        })}>
+          Request fullscreen (webkit sync)
+        </button>
+
+        <br />
+
+        <button type="button" onClick={withErrorBoundary(async () => {
+          const video = videoRef.current as HTMLVideoElement & {
+            webkitEnterFullscreen?: () => void;
+          };
+          if (!video) throw new Error('Expected video ref to not be empty');
+
+          if (typeof video.webkitEnterFullscreen !== 'function') {
+            throw new Error('Webkit enter fullscreen API not available');
+          }
+
+          video.webkitEnterFullscreen();
+        })}>
+          Request fullscreen (webkit async)
+        </button>
+
+        <br />
+
+        <button type="button" onClick={withErrorBoundary(async () => {
+          const video = videoRef.current as HTMLVideoElement & {
+            webkitEnterFullscreen?: () => void;
+          };
+          if (!video) throw new Error('Expected video ref to not be empty');
+
+          if (typeof video.webkitEnterFullscreen !== 'function') {
+            throw new Error('Webkit enter fullscreen API not available');
+          }
+
+          await video.webkitEnterFullscreen();
+        })}>
+          Request fullscreen (webkit async/await)
         </button>
       </div>
     </>
