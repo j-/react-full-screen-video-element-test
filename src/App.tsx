@@ -1,4 +1,4 @@
-import { useId, useRef, useState, type FC } from 'react';
+import { useEffect, useId, useRef, useState, type FC } from 'react';
 import { useErrorBoundary } from 'react-error-boundary';
 import screenfull from 'screenfull';
 
@@ -16,10 +16,21 @@ export const App: FC = () => {
   
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
+  const [ctx, setCtx] = useState<CanvasRenderingContext2D | null>(null);
 
   const [selectedColor, setSelectedColor] = useState('#000000');
 
   const { showBoundary } = useErrorBoundary();
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    assert(canvas, 'Expected canvas ref to not be empty');
+    
+    const ctx = canvas.getContext('2d');
+    assert(ctx, 'Failed to get canvas rendering context');
+
+    setCtx(ctx);
+  }, []);
 
   return (
     <>
@@ -154,6 +165,33 @@ export const App: FC = () => {
           }
         }}>
           Paint and capture
+        </button>
+
+        <br />
+
+        <button type="button" onClick={() => {
+          try {
+            const canvas = canvasRef.current;
+            assert(canvas, 'Expected canvas ref to not be empty');
+
+            const video = videoRef.current;
+            assert(video, 'Expected video ref to not be empty');
+            
+            assert(ctx, 'No prebaked ctx available');
+            
+            ctx.fillStyle = selectedColor;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+            const stream = canvas.captureStream(0);
+            const [track] = stream.getVideoTracks() as CanvasCaptureMediaStreamTrack[];
+            track.requestFrame();
+        
+            video.srcObject = new MediaStream([track]);
+          } catch (err) {
+            showBoundary(err);
+          }
+        }}>
+          Paint and capture (prebaked ctx)
         </button>
 
         <br />
