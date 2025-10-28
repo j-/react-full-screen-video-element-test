@@ -214,6 +214,21 @@ export const App: FC = () => {
             </button>
 
             <br />
+
+            <button type="button" onClick={() => {
+              try {
+                const video = videoRef.current;
+                assert(video, 'Expected video ref to not be empty');
+                
+                video.preload = 'metadata';
+              } catch (err) {
+                showBoundary(err);
+              }
+            }}>
+              Preload metadata
+            </button>
+
+            <br />
             <br />
 
             <button type="button" onClick={async () => {
