@@ -54,242 +54,248 @@ export const App: FC = () => {
 
       <output htmlFor={inputColorId}>{selectedColor}</output>
 
-      <h2>Canvas</h2>
+      <div style={{ display: 'flex', gap: '1rem' }}>
+        <div style={{ flex: 2 }}>
+          <h2>Canvas</h2>
 
-      <canvas
-        ref={canvasRef}
-        width={100}
-        height={100}
-        style={{
-          width: '6rem',
-          height: '6rem',
-          border: '2px inset #888',
-          background: `#eee url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 2'><path fill='%23fff' d='M0 0H1V2H2V1H0Z'/></svg>") 0 0/2rem`,
-        }}
-      />
+          <canvas
+            ref={canvasRef}
+            width={100}
+            height={100}
+            style={{
+              width: '6rem',
+              height: '6rem',
+              border: '2px inset #888',
+              background: `#eee url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 2'><path fill='%23fff' d='M0 0H1V2H2V1H0Z'/></svg>") 0 0/2rem`,
+            }}
+          />
 
-      <div>
-        <button type="button" onClick={async () => {
-          try {
-            const canvas = canvasRef.current;
-            assert(canvas, 'Expected canvas ref to not be empty');
-            
-            const ctx = canvas.getContext('2d');
-            assert(ctx, 'Failed to get canvas rendering context');
+          <div>
+            <button type="button" onClick={async () => {
+              try {
+                const canvas = canvasRef.current;
+                assert(canvas, 'Expected canvas ref to not be empty');
                 
-            ctx.fillStyle = selectedColor;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-          } catch (err) {
-            showBoundary(err);
-          }
-        }}>
-          Fill with input color
-        </button>
+                const ctx = canvas.getContext('2d');
+                assert(ctx, 'Failed to get canvas rendering context');
+                    
+                ctx.fillStyle = selectedColor;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+              } catch (err) {
+                showBoundary(err);
+              }
+            }}>
+              Fill with input color
+            </button>
 
-        <br />
-        <br />
+            <br />
+            <br />
 
-        <button type="button" onClick={async () => {
-          try {
-            const canvas = canvasRef.current;
-            assert(canvas, 'Expected canvas ref to not be empty');
+            <button type="button" onClick={async () => {
+              try {
+                const canvas = canvasRef.current;
+                assert(canvas, 'Expected canvas ref to not be empty');
 
-            await screenfull.request(canvas);
-          } catch (err) {
-            showBoundary(err);
-          }
-        }}>
-          Request fullscreen (screenfull)
-        </button>
-      </div>
+                await screenfull.request(canvas);
+              } catch (err) {
+                showBoundary(err);
+              }
+            }}>
+              Request fullscreen<br />(screenfull)
+            </button>
+          </div>
+        </div>
 
-      <h2>Video</h2>
+        <div style={{ flex: 3 }}>
+          <h2>Video</h2>
 
-      <video
-        ref={videoRef}
-        width={100}
-        height={100}
-        autoPlay
-        style={{
-          width: '6rem',
-          height: '6rem',
-          border: '2px inset #888',
-          background: `#eee url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 2'><path fill='%23fff' d='M0 0H1V2H2V1H0Z'/></svg>") 0 0/2rem`,
-        }}
-      />
+          <video
+            ref={videoRef}
+            width={100}
+            height={100}
+            autoPlay
+            style={{
+              width: '6rem',
+              height: '6rem',
+              border: '2px inset #888',
+              background: `#eee url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 2 2'><path fill='%23fff' d='M0 0H1V2H2V1H0Z'/></svg>") 0 0/2rem`,
+            }}
+          />
 
-      <div>
-        <button type="button" onClick={() => {
-          try {
-            const canvas = canvasRef.current;
-            assert(canvas, 'Expected canvas ref to not be empty');
+          <div>
+            <button type="button" onClick={() => {
+              try {
+                const canvas = canvasRef.current;
+                assert(canvas, 'Expected canvas ref to not be empty');
+                
+                const video = videoRef.current;
+                assert(video, 'Expected video ref to not be empty');
+                
+                const stream = canvas.captureStream(0);
+                const [track] = stream.getVideoTracks() as CanvasCaptureMediaStreamTrack[];
+                track.requestFrame();
             
-            const video = videoRef.current;
-            assert(video, 'Expected video ref to not be empty');
+                video.srcObject = new MediaStream([track]);
+              } catch (err) {
+                showBoundary(err);
+              }
+            }}>
+              Set video stream
+            </button>
+
+            <br />
+
+            <button type="button" onClick={() => {
+              try {
+                const canvas = canvasRef.current;
+                assert(canvas, 'Expected canvas ref to not be empty');
+
+                const video = videoRef.current;
+                assert(video, 'Expected video ref to not be empty');
+
+                const ctx = canvas.getContext('2d');
+                assert(ctx, 'Failed to get canvas rendering context');
+
+                ctx.fillStyle = selectedColor;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            const stream = canvas.captureStream(0);
-            const [track] = stream.getVideoTracks() as CanvasCaptureMediaStreamTrack[];
-            track.requestFrame();
-        
-            video.srcObject = new MediaStream([track]);
-          } catch (err) {
-            showBoundary(err);
-          }
-        }}>
-          Set video stream
-        </button>
-
-        <br />
-
-        <button type="button" onClick={() => {
-          try {
-            const canvas = canvasRef.current;
-            assert(canvas, 'Expected canvas ref to not be empty');
-
-            const video = videoRef.current;
-            assert(video, 'Expected video ref to not be empty');
-
-            const ctx = canvas.getContext('2d');
-            assert(ctx, 'Failed to get canvas rendering context');
-
-            ctx.fillStyle = selectedColor;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-            const stream = canvas.captureStream(0);
-            const [track] = stream.getVideoTracks() as CanvasCaptureMediaStreamTrack[];
-            track.requestFrame();
-        
-            video.srcObject = new MediaStream([track]);
-          } catch (err) {
-            showBoundary(err);
-          }
-        }}>
-          Paint and capture
-        </button>
-
-        <br />
-
-        <button type="button" onClick={() => {
-          try {
-            const canvas = canvasRef.current;
-            assert(canvas, 'Expected canvas ref to not be empty');
-
-            const video = videoRef.current;
-            assert(video, 'Expected video ref to not be empty');
+                const stream = canvas.captureStream(0);
+                const [track] = stream.getVideoTracks() as CanvasCaptureMediaStreamTrack[];
+                track.requestFrame();
             
-            assert(ctx, 'No prebaked ctx available');
+                video.srcObject = new MediaStream([track]);
+              } catch (err) {
+                showBoundary(err);
+              }
+            }}>
+              Paint and capture
+            </button>
+
+            <br />
+
+            <button type="button" onClick={() => {
+              try {
+                const canvas = canvasRef.current;
+                assert(canvas, 'Expected canvas ref to not be empty');
+
+                const video = videoRef.current;
+                assert(video, 'Expected video ref to not be empty');
+
+                assert(ctx, 'No prebaked ctx available');
+                
+                ctx.fillStyle = selectedColor;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            ctx.fillStyle = selectedColor;
-            ctx.fillRect(0, 0, canvas.width, canvas.height);
-        
-            const stream = canvas.captureStream(0);
-            const [track] = stream.getVideoTracks() as CanvasCaptureMediaStreamTrack[];
-            track.requestFrame();
-        
-            video.srcObject = new MediaStream([track]);
-          } catch (err) {
-            showBoundary(err);
-          }
-        }}>
-          Paint and capture (prebaked ctx)
-        </button>
-
-        <br />
-
-        <button type="button" onClick={() => {
-          try {
-            const video = videoRef.current;
-            assert(video, 'Expected video ref to not be empty');
+                const stream = canvas.captureStream(0);
+                const [track] = stream.getVideoTracks() as CanvasCaptureMediaStreamTrack[];
+                track.requestFrame();
             
-            video.play();
-          } catch (err) {
-            showBoundary(err);
-          }
-        }}>
-          Play video
-        </button>
+                video.srcObject = new MediaStream([track]);
+              } catch (err) {
+                showBoundary(err);
+              }
+            }}>
+              Paint and capture<br />(prebaked ctx)
+            </button>
 
-        <br />
-        <br />
+            <br />
 
-        <button type="button" onClick={async () => {
-          try {
-            const video = videoRef.current;
-            assert(video, 'Expected video ref to not be empty');
+            <button type="button" onClick={() => {
+              try {
+                const video = videoRef.current;
+                assert(video, 'Expected video ref to not be empty');
+                
+                video.play();
+              } catch (err) {
+                showBoundary(err);
+              }
+            }}>
+              Play video
+            </button>
 
-            await screenfull.request(video);
-          } catch (err) {
-            showBoundary(err);
-          }
-        }}>
-          Request fullscreen (screenfull)
-        </button>
+            <br />
+            <br />
 
-        <br />
+            <button type="button" onClick={async () => {
+              try {
+                const video = videoRef.current;
+                assert(video, 'Expected video ref to not be empty');
 
-        <button type="button" onClick={() => {
-          try {
-            const video = videoRef.current as HTMLVideoElement & {
-              webkitEnterFullscreen?: () => void;
-            };
-            assert(video, 'Expected video ref to not be empty');
+                await screenfull.request(video);
+              } catch (err) {
+                showBoundary(err);
+              }
+            }}>
+              Request fullscreen<br />(screenfull)
+            </button>
 
-            assert(
-              typeof video.webkitEnterFullscreen === 'function',
-              'Webkit enter fullscreen API not available'
-            );
+            <br />
 
-            video.webkitEnterFullscreen();
-          } catch (err) {
-            showBoundary(err);
-          }
-        }}>
-          Request fullscreen (webkit sync)
-        </button>
+            <button type="button" onClick={() => {
+              try {
+                const video = videoRef.current as HTMLVideoElement & {
+                  webkitEnterFullscreen?: () => void;
+                };
+                assert(video, 'Expected video ref to not be empty');
 
-        <br />
+                assert(
+                  typeof video.webkitEnterFullscreen === 'function',
+                  'Webkit enter fullscreen API not available'
+                );
 
-        <button type="button" onClick={async () => {
-          try {
-            const video = videoRef.current as HTMLVideoElement & {
-              webkitEnterFullscreen?: () => void;
-            };
-            assert(video, 'Expected video ref to not be empty');
+                video.webkitEnterFullscreen();
+              } catch (err) {
+                showBoundary(err);
+              }
+            }}>
+              Request fullscreen<br />(webkit sync)
+            </button>
 
-            assert(
-              typeof video.webkitEnterFullscreen === 'function',
-              'Webkit enter fullscreen API not available'
-            );
+            <br />
 
-            video.webkitEnterFullscreen();
-          } catch (err) {
-            showBoundary(err);
-          }
-        }}>
-          Request fullscreen (webkit async)
-        </button>
+            <button type="button" onClick={async () => {
+              try {
+                const video = videoRef.current as HTMLVideoElement & {
+                  webkitEnterFullscreen?: () => void;
+                };
+                assert(video, 'Expected video ref to not be empty');
 
-        <br />
+                assert(
+                  typeof video.webkitEnterFullscreen === 'function',
+                  'Webkit enter fullscreen API not available'
+                );
 
-        <button type="button" onClick={async () => {
-          try {
-            const video = videoRef.current as HTMLVideoElement & {
-              webkitEnterFullscreen?: () => void;
-            };
-            assert(video, 'Expected video ref to not be empty');
+                video.webkitEnterFullscreen();
+              } catch (err) {
+                showBoundary(err);
+              }
+            }}>
+              Request fullscreen<br />(webkit async)
+            </button>
 
-            assert(
-              typeof video.webkitEnterFullscreen === 'function',
-              'Webkit enter fullscreen API not available'
-            );
+            <br />
 
-            await video.webkitEnterFullscreen();
-          } catch (err) {
-            showBoundary(err);
-          }
-        }}>
-          Request fullscreen (webkit async/await)
-        </button>
+            <button type="button" onClick={async () => {
+              try {
+                const video = videoRef.current as HTMLVideoElement & {
+                  webkitEnterFullscreen?: () => void;
+                };
+                assert(video, 'Expected video ref to not be empty');
+
+                assert(
+                  typeof video.webkitEnterFullscreen === 'function',
+                  'Webkit enter fullscreen API not available'
+                );
+
+                await video.webkitEnterFullscreen();
+              } catch (err) {
+                showBoundary(err);
+              }
+            }}>
+              Request fullscreen<br />(webkit async/await)
+            </button>
+          </div>
+        </div>
       </div>
     </>
   );
