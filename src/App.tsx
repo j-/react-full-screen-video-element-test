@@ -119,6 +119,17 @@ export const App: FC = () => {
         </button>
 
         <br />
+
+        <button type="button" onClick={withErrorBoundary(async () => {
+          const video = videoRef.current;
+          if (!video) throw new Error('Expected video ref to not be empty');
+          
+          video.play();
+        })}>
+          Play video
+        </button>
+
+        <br />
         <br />
 
         <button type="button" onClick={withErrorBoundary(async () => {
