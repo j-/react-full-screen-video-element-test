@@ -2,6 +2,14 @@ import { useId, useRef, useState, type FC } from 'react';
 import { useErrorBoundary } from 'react-error-boundary';
 import screenfull from 'screenfull';
 
+function assert(
+  condition: unknown,
+  message = 'Assertion failed',
+): asserts condition {
+  if (condition) return;
+  throw new Error(message);
+}
+
 export const App: FC = () => {
   const id = useId();
   const inputColorId = `${id}-input-color`;
@@ -53,10 +61,10 @@ export const App: FC = () => {
         <button type="button" onClick={async () => {
           try {
             const canvas = canvasRef.current;
-            if (!canvas) throw new Error('Expected canvas ref to not be empty');
+            assert(canvas, 'Expected canvas ref to not be empty');
             
             const ctx = canvas.getContext('2d');
-            if (!ctx) throw new Error('Failed to get canvas rendering context');
+            assert(ctx, 'Failed to get canvas rendering context');
                 
             ctx.fillStyle = selectedColor;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -73,9 +81,9 @@ export const App: FC = () => {
         <button type="button" onClick={async () => {
           try {
             const canvas = canvasRef.current;
-            if (!canvas) throw new Error('Expected canvas ref to not be empty');
+            assert(canvas, 'Expected canvas ref to not be empty');
 
-            await screenfull.request(canvasRef.current!);
+            await screenfull.request(canvas);
           } catch (err) {
             showBoundary(err);
           }
@@ -103,10 +111,10 @@ export const App: FC = () => {
         <button type="button" onClick={() => {
           try {
             const canvas = canvasRef.current;
-            if (!canvas) throw new Error('Expected canvas ref to not be empty');
+            assert(canvas, 'Expected canvas ref to not be empty');
             
             const video = videoRef.current;
-            if (!video) throw new Error('Expected video ref to not be empty');
+            assert(video, 'Expected video ref to not be empty');
             
             const stream = canvas.captureStream(0);
             const [track] = stream.getVideoTracks() as CanvasCaptureMediaStreamTrack[];
@@ -125,13 +133,13 @@ export const App: FC = () => {
         <button type="button" onClick={() => {
           try {
             const canvas = canvasRef.current;
-            if (!canvas) throw new Error('Expected canvas ref to not be empty');
+            assert(canvas, 'Expected canvas ref to not be empty');
 
             const video = videoRef.current;
-            if (!video) throw new Error('Expected video ref to not be empty');
+            assert(video, 'Expected video ref to not be empty');
 
             const ctx = canvas.getContext('2d');
-            if (!ctx) throw new Error('Failed to get canvas rendering context');
+            assert(ctx, 'Failed to get canvas rendering context');
 
             ctx.fillStyle = selectedColor;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -153,7 +161,7 @@ export const App: FC = () => {
         <button type="button" onClick={() => {
           try {
             const video = videoRef.current;
-            if (!video) throw new Error('Expected video ref to not be empty');
+            assert(video, 'Expected video ref to not be empty');
             
             video.play();
           } catch (err) {
@@ -169,9 +177,9 @@ export const App: FC = () => {
         <button type="button" onClick={async () => {
           try {
             const video = videoRef.current;
-            if (!video) throw new Error('Expected video ref to not be empty');
+            assert(video, 'Expected video ref to not be empty');
 
-            await screenfull.request(videoRef.current!);
+            await screenfull.request(video);
           } catch (err) {
             showBoundary(err);
           }
@@ -186,11 +194,12 @@ export const App: FC = () => {
             const video = videoRef.current as HTMLVideoElement & {
               webkitEnterFullscreen?: () => void;
             };
-            if (!video) throw new Error('Expected video ref to not be empty');
+            assert(video, 'Expected video ref to not be empty');
 
-            if (typeof video.webkitEnterFullscreen !== 'function') {
-              throw new Error('Webkit enter fullscreen API not available');
-            }
+            assert(
+              typeof video.webkitEnterFullscreen === 'function',
+              'Webkit enter fullscreen API not available'
+            );
 
             video.webkitEnterFullscreen();
           } catch (err) {
@@ -207,11 +216,12 @@ export const App: FC = () => {
             const video = videoRef.current as HTMLVideoElement & {
               webkitEnterFullscreen?: () => void;
             };
-            if (!video) throw new Error('Expected video ref to not be empty');
+            assert(video, 'Expected video ref to not be empty');
 
-            if (typeof video.webkitEnterFullscreen !== 'function') {
-              throw new Error('Webkit enter fullscreen API not available');
-            }
+            assert(
+              typeof video.webkitEnterFullscreen === 'function',
+              'Webkit enter fullscreen API not available'
+            );
 
             video.webkitEnterFullscreen();
           } catch (err) {
@@ -228,11 +238,12 @@ export const App: FC = () => {
             const video = videoRef.current as HTMLVideoElement & {
               webkitEnterFullscreen?: () => void;
             };
-            if (!video) throw new Error('Expected video ref to not be empty');
+            assert(video, 'Expected video ref to not be empty');
 
-            if (typeof video.webkitEnterFullscreen !== 'function') {
-              throw new Error('Webkit enter fullscreen API not available');
-            }
+            assert(
+              typeof video.webkitEnterFullscreen === 'function',
+              'Webkit enter fullscreen API not available'
+            );
 
             await video.webkitEnterFullscreen();
           } catch (err) {
