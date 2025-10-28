@@ -102,7 +102,7 @@ export const App: FC = () => {
       />
 
       <div>
-        <button type="button" onClick={withErrorBoundary(async () => {
+        <button type="button" onClick={withErrorBoundary(() => {
           const canvas = canvasRef.current;
           if (!canvas) throw new Error('Expected canvas ref to not be empty');
           
@@ -120,7 +120,31 @@ export const App: FC = () => {
 
         <br />
 
-        <button type="button" onClick={withErrorBoundary(async () => {
+        <button type="button" onClick={withErrorBoundary(() => {
+          const canvas = canvasRef.current;
+          if (!canvas) throw new Error('Expected canvas ref to not be empty');
+
+          const video = videoRef.current;
+          if (!video) throw new Error('Expected video ref to not be empty');
+
+          const ctx = canvas.getContext('2d');
+          if (!ctx) throw new Error('Failed to get canvas rendering context');
+
+          ctx.fillStyle = selectedColor;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+      
+          const stream = canvas.captureStream(0);
+          const [track] = stream.getVideoTracks() as CanvasCaptureMediaStreamTrack[];
+          track.requestFrame();
+      
+          video.srcObject = new MediaStream([track]);
+        })}>
+          Paint and capture
+        </button>
+
+        <br />
+
+        <button type="button" onClick={withErrorBoundary(() => {
           const video = videoRef.current;
           if (!video) throw new Error('Expected video ref to not be empty');
           
